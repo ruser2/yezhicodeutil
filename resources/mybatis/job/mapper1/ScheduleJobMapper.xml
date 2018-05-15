@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yllt.mapper.job.ScheduleJobMapper" > 
+<!-- Result Map-->
+<resultMap id="BaseResultMap" type="com.yllt.domain.job.ScheduleJob" >
+		<result column="id" property="id"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="job_name" property="jobName"/>
+		<result column="job_group" property="jobGroup"/>
+		<result column="job_status" property="jobStatus"/>
+		<result column="cron_expression" property="cronExpression"/>
+		<result column="description" property="description"/>
+		<result column="bean_class" property="beanClass"/>
+		<result column="is_concurrent" property="isConcurrent"/>
+		<result column="spring_id" property="springId"/>
+		<result column="method_name" property="methodName"/>
+		<result column="is_once" property="isOnce"/>
+	</resultMap>
+       
+<!-- schedule_job table all fields -->
+<sql id="Base_Column_List" >
+	 id,create_time,update_time,job_name,job_group,job_status,cron_expression,description,bean_class,is_concurrent,spring_id,method_name,is_once
+</sql>
+   
+   
+<!-- 查询条件 -->
+<sql id="Example_Where_Clause">
+where 1=1
+<trim  suffixOverrides="," >
+	<if test="id != null and id != ''" >
+	and id =  #{id}
+</if>
+	<if test="createTime != null and createTime != ''" >
+	and create_time =  #{createTime}
+</if>
+	<if test="updateTime != null and updateTime != ''" >
+	and update_time =  #{updateTime}
+</if>
+	<if test="jobName != null and jobName != ''" >
+	and job_name =  #{jobName}
+</if>
+	<if test="jobGroup != null and jobGroup != ''" >
+	and job_group =  #{jobGroup}
+</if>
+	<if test="jobStatus != null and jobStatus != ''" >
+	and job_status =  #{jobStatus}
+</if>
+	<if test="cronExpression != null and cronExpression != ''" >
+	and cron_expression =  #{cronExpression}
+</if>
+	<if test="description != null and description != ''" >
+	and description =  #{description}
+</if>
+	<if test="beanClass != null and beanClass != ''" >
+	and bean_class =  #{beanClass}
+</if>
+	<if test="isConcurrent != null and isConcurrent != ''" >
+	and is_concurrent =  #{isConcurrent}
+</if>
+	<if test="springId != null and springId != ''" >
+	and spring_id =  #{springId}
+</if>
+	<if test="methodName != null and methodName != ''" >
+	and method_name =  #{methodName}
+</if>
+	<if test="isOnce != null and isOnce != ''" >
+	and is_once =  #{isOnce}
+</if>
+</trim>
+</sql>
+   
+
+<!-- 插入记录 -->
+<insert id="insert" parameterType="Object" keyProperty="uuid">
+  insert into schedule_job(id,create_time,update_time,job_name,job_group,job_status,cron_expression,description,bean_class,is_concurrent,spring_id,method_name,is_once)
+ values(#{id},now(),now(),#{jobName},#{jobGroup},#{jobStatus},#{cronExpression},#{description},#{beanClass},#{isConcurrent},#{springId},#{methodName},#{isOnce})
+</insert>
+
+<!-- 根据id，修改记录-->  
+<update id="updateByPrimaryKey" parameterType="Object" >
+  update schedule_job set create_time=now(),update_time=now(),job_name=#{jobName},job_group=#{jobGroup},job_status=#{jobStatus},cron_expression=#{cronExpression},description=#{description},bean_class=#{beanClass},is_concurrent=#{isConcurrent},spring_id=#{springId},method_name=#{methodName},is_once=#{isOnce} where id=#{id}
+</update>
+ 
+<!-- 修改记录，只修改只不为空的字段 -->
+<update id="updateByPrimaryKeySelective" parameterType="Object" >
+	update schedule_job set 
+	<trim  suffixOverrides="," >
+	<if test="createTime != null  ">
+		create_time=#{createTime},
+	</if>
+	<if test="updateTime != null  ">
+		update_time=#{updateTime},
+	</if>
+	<if test="jobName != null  ">
+		job_name=#{jobName},
+	</if>
+	<if test="jobGroup != null  ">
+		job_group=#{jobGroup},
+	</if>
+	<if test="jobStatus != null  ">
+		job_status=#{jobStatus},
+	</if>
+	<if test="cronExpression != null  ">
+		cron_expression=#{cronExpression},
+	</if>
+	<if test="description != null  ">
+		description=#{description},
+	</if>
+	<if test="beanClass != null  ">
+		bean_class=#{beanClass},
+	</if>
+	<if test="isConcurrent != null  ">
+		is_concurrent=#{isConcurrent},
+	</if>
+	<if test="springId != null  ">
+		spring_id=#{springId},
+	</if>
+	<if test="methodName != null  ">
+		method_name=#{methodName},
+	</if>
+	<if test="isOnce != null  ">
+		is_once=#{isOnce},
+	</if>
+	</trim> where id=#{id}
+</update>
+
+<!-- 删除记录 -->
+<delete id="deleteByPrimaryKey" parameterType="Object">
+	delete 	 from schedule_job where id = #{id}
+</delete>
+ 
+<!-- 根据id查询 schedule_job -->
+<select id="selectByPrimaryKey"  resultMap="BaseResultMap" parameterType="Object">
+	select <include refid="Base_Column_List" /> 
+	 from schedule_job where id = #{id}
+</select>
+
+<!-- schedule_job 列表总数-->
+<select id="queryByCount" resultType="java.lang.Integer"  parameterType="Object">
+	select count(1) from schedule_job t1
+	<include refid="Example_Where_Clause"/>
+</select>
+  	
+<!-- 查询schedule_job列表 -->
+<select id="query" resultMap="BaseResultMap"  parameterType="Object">
+	select 
+	<include refid="Base_Column_List"/>
+	from schedule_job t1
+	<include refid="Example_Where_Clause"/>
+</select>
+  	
+</mapper>   

@@ -1,0 +1,139 @@
+package com.yllt.utils;
+
+import com.yllt.constatns.ErrorCode;
+import com.yllt.enumeration.RegexType;
+import com.yllt.response.Response;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.lang.reflect.Field;
+
+
+/*
+ * EEfuse
+ * @author Sean Lai
+ * @version 1.0,2010/12/7
+ * Copyright (c) 2010.
+ */
+
+
+public class ValidateService {
+    private static final Log logger = LogFactory.getLog(ValidateService.class);
+//    private static com.manager.com.framework.json.annotation.Field field;
+
+
+    //解析的入口
+    public static Response validate(Object object){
+        //TODO  属性为     数组类型 和对象类型  没有处理
+
+        //获取object的类型
+        Class<? extends Object> clazz = object.getClass();
+        //获取该类型声明的成员
+        Field[] fields = clazz.getDeclaredFields();
+        //遍历属性
+        for (Field field : fields) {
+            //对于private私有化的成员变量，通过setAccessible来修改器访问权限
+            field.setAccessible(true);
+            Response response = validate(field, object);
+            //重新设置回私有权限
+            field.setAccessible(false);
+            if (response != null) {
+                return response;
+            }
+        }
+        return null;
+    }
+
+    public static Response validate(Field field, Object object){
+        String description;
+        Object value=null;
+
+
+        //获取对象的成员的注解信息
+        com.yllt.com.framework.json.annotation.Field dv = field.getAnnotation(com.yllt.com.framework.json.annotation.Field.class);
+        try {
+            value = field.get(object);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        //TODO  inner class 的校验
+//        if(value instanceof Collection){
+//            System.out.println("yes");
+//            Iterator it=((Collection) value).iterator();
+//
+//            String name = field.getType().getName();
+//            String typeName = name.replace("[L", "").replace(";", "");
+//            try {
+//                Class typeClass = Class.forName(typeName);
+//            } catch (ClassNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//            while (it.hasNext()) {
+//
+//            }
+//
+//        } else {
+//            System.out.println("no");
+//        }
+
+        if (dv == null) {
+            return null;
+        }
+        description = dv.description().equals("") ? field.getName() : dv.description();
+        if (!dv.nullable()) {
+            if (value == null || StringUtil.isBlank(value.toString())) {
+                return Response.fail(description + "不能为空", ErrorCode.PARAMETER_NO_MATCH);
+            }
+        }
+        if (value.toString().length() > dv.maxLength() && dv.maxLength() != 0) {
+            return Response.fail(description + "长度不能超过" + dv.maxLength(), ErrorCode.PARAMETER_NO_MATCH);
+        }
+        if (value.toString().length() < dv.minLength() && dv.minLength() != 0) {
+            return Response.fail(description + "长度不能小于" + dv.minLength(), ErrorCode.PARAMETER_NO_MATCH);
+        }
+        if (dv.regexType() != RegexType.NONE) {
+            switch (dv.regexType()) {
+                case NONE:
+                    break;
+                case SPECIALCHAR:
+                    if (RegexUtils.hasSpecialChar(value.toString())) {
+                        return Response.fail(description + "不能含有特殊字符", ErrorCode.PARAMETER_NO_MATCH);
+                    }
+                    break;
+                case CHINESE:
+                    if (RegexUtils.isChinese2(value.toString())) {
+                        return Response.fail(description + "不能含有中文字符", ErrorCode.PARAMETER_NO_MATCH);
+                    }
+                    break;
+                case EMAIL:
+                    if (!RegexUtils.isEmail(value.toString())) {
+                        return Response.fail(description + "email格式不正确", ErrorCode.PARAMETER_NO_MATCH);
+                    }
+                    break;
+                case IP:
+                    if (!RegexUtils.isIp(value.toString())) {
+                        return Response.fail(description + "ip地址格式不正确", ErrorCode.PARAMETER_NO_MATCH);
+                    }
+                    break;
+                case NUMBER:
+                    if (!RegexUtils.isNumber(value.toString())) {
+                        return Response.fail(description + "不是数字", ErrorCode.PARAMETER_NO_MATCH);
+                    }
+                    break;
+                case PHONENUMBER:
+                    if (!RegexUtils.isPhoneNumber(value.toString())) {
+                        return Response.fail(description + "不是手机号码", ErrorCode.PARAMETER_NO_MATCH);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (!dv.regexExpression().equals("")) {
+            if (value.toString().matches(dv.regexExpression())) {
+                return Response.fail(description + "格式不正确", ErrorCode.PARAMETER_NO_MATCH);
+            }
+        }
+        return null;
+    }
+}

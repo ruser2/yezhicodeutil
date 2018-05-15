@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper..IpkCardMapper" > 
+<!-- Result Map-->
+<resultMap id="BaseResultMap" type="com.domain..IpkCard" >
+<!-- 	<result column="id" property="id"/>
+	<result column="card_no" property="card_no"/>
+	<result column="card_type_id" property="card_type_id"/>
+	<result column="car_name" property="car_name"/>
+	<result column="car_no" property="car_no"/>
+	<result column="remark" property="remark"/>
+	<result column="start_time" property="start_time"/>
+	<result column="end_time" property="end_time"/>
+	<result column="charge_type" property="charge_type"/>
+	<result column="phone" property="phone"/>
+	<result column="identity_number" property="identity_number"/>
+	<result column="is_del" property="is_del"/>
+	<result column="create_date" property="create_date"/>
+	<result column="update_date" property="update_date"/>
+	<result column="status" property="status"/>
+	<result column="money" property="money"/>
+	<result column="card_type_name" property="card_type_name"/>
+	<result column="charge_type_name" property="charge_type_name"/>
+ -->
+	<id column="id" property="id" jdbcType="BIGINT" />
+
+</resultMap>
+       
+<!-- ipk_card table all fields -->
+<sql id="Base_Column_List" >
+	 id,card_no,card_type_id,car_name,car_no,remark,start_time,end_time,charge_type,phone,identity_number,is_del,create_date,update_date,status,money,card_type_name,charge_type_name
+</sql>
+   
+   
+<!-- 查询条件 -->
+<sql id="Example_Where_Clause">
+where 1=1
+<trim  suffixOverrides="," >
+	<if test="id != null and id != ''" >
+	    and id =  #{id}
+	</if>
+	<if test="card_no != null and card_no != ''" >
+	    and card_no =  #{card_no}
+	</if>
+	<if test="card_type_id != null and card_type_id != ''" >
+	    and card_type_id =  #{card_type_id}
+	</if>
+	<if test="car_name != null and car_name != ''" >
+	    and car_name =  #{car_name}
+	</if>
+	<if test="car_no != null and car_no != ''" >
+	    and car_no =  #{car_no}
+	</if>
+	<if test="remark != null and remark != ''" >
+	    and remark =  #{remark}
+	</if>
+	<if test="start_time != null and start_time != ''" >
+	    and start_time =  #{start_time}
+	</if>
+	<if test="end_time != null and end_time != ''" >
+	    and end_time =  #{end_time}
+	</if>
+	<if test="charge_type != null and charge_type != ''" >
+	    and charge_type =  #{charge_type}
+	</if>
+	<if test="phone != null and phone != ''" >
+	    and phone =  #{phone}
+	</if>
+	<if test="identity_number != null and identity_number != ''" >
+	    and identity_number =  #{identity_number}
+	</if>
+	<if test="is_del != null and is_del != ''" >
+	    and is_del =  #{is_del}
+	</if>
+	<if test="create_date != null and create_date != ''" >
+	    and create_date =  #{create_date}
+	</if>
+	<if test="update_date != null and update_date != ''" >
+	    and update_date =  #{update_date}
+	</if>
+	<if test="status != null and status != ''" >
+	    and status =  #{status}
+	</if>
+	<if test="money != null and money != ''" >
+	    and money =  #{money}
+	</if>
+	<if test="card_type_name != null and card_type_name != ''" >
+	    and card_type_name =  #{card_type_name}
+	</if>
+	<if test="charge_type_name != null and charge_type_name != ''" >
+	    and charge_type_name =  #{charge_type_name}
+	</if>
+</trim>
+</sql>
+   
+
+<!-- 插入记录 -->
+<insert id="insert" parameterType="Object" >
+<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+	SELECT LAST_INSERT_ID()
+  </selectKey>
+  insert into ipk_card(id,card_no,card_type_id,car_name,car_no,remark,start_time,end_time,charge_type,phone,identity_number,is_del,create_date,update_date,status,money,card_type_name,charge_type_name)
+ values(#{id},#{card_no},#{card_type_id},#{car_name},#{car_no},#{remark},#{start_time},#{end_time},#{charge_type},#{phone},#{identity_number},#{is_del},#{create_date},#{update_date},#{status},#{money},#{card_type_name},#{charge_type_name})
+</insert>
+
+<!-- 根据id，修改记录-->  
+ <update id="updateByPrimaryKey" parameterType="Object" >
+  update ipk_card set card_no=#{card_no},card_type_id=#{card_type_id},car_name=#{car_name},car_no=#{car_no},remark=#{remark},start_time=#{start_time},end_time=#{end_time},charge_type=#{charge_type},phone=#{phone},identity_number=#{identity_number},is_del=#{is_del},create_date=#{create_date},update_date=#{update_date},status=#{status},money=#{money},card_type_name=#{card_type_name},charge_type_name=#{charge_type_name} where id=#{id}
+ </update>
+ 
+ <!-- 修改记录，只修改只不为空的字段 -->
+<update id="updateByPrimaryKeySelective" parameterType="Object" >
+	update ipk_card set 
+	<trim  suffixOverrides="," >
+	<if test="card_no != null  ">
+		card_no=#{card_no},
+	</if>
+	<if test="card_type_id != null  ">
+		card_type_id=#{card_type_id},
+	</if>
+	<if test="car_name != null  ">
+		car_name=#{car_name},
+	</if>
+	<if test="car_no != null  ">
+		car_no=#{car_no},
+	</if>
+	<if test="remark != null  ">
+		remark=#{remark},
+	</if>
+	<if test="start_time != null  ">
+		start_time=#{start_time},
+	</if>
+	<if test="end_time != null  ">
+		end_time=#{end_time},
+	</if>
+	<if test="charge_type != null  ">
+		charge_type=#{charge_type},
+	</if>
+	<if test="phone != null  ">
+		phone=#{phone},
+	</if>
+	<if test="identity_number != null  ">
+		identity_number=#{identity_number},
+	</if>
+	<if test="is_del != null  ">
+		is_del=#{is_del},
+	</if>
+	<if test="create_date != null  ">
+		create_date=#{create_date},
+	</if>
+	<if test="update_date != null  ">
+		update_date=#{update_date},
+	</if>
+	<if test="status != null  ">
+		status=#{status},
+	</if>
+	<if test="money != null  ">
+		money=#{money},
+	</if>
+	<if test="card_type_name != null  ">
+		card_type_name=#{card_type_name},
+	</if>
+	<if test="charge_type_name != null  ">
+		charge_type_name=#{charge_type_name},
+	</if>
+	</trim> where id=#{id}
+</update>
+
+<!-- 删除记录 -->
+<delete id="deleteByPrimaryKey" parameterType="Object">
+	delete 	 from ipk_card where id = #{id}
+</delete>
+ 
+<!-- 根据id查询 卡片信息表 -->
+<select id="selectByPrimaryKey"  resultMap="BaseResultMap" parameterType="Object">
+	select <include refid="Base_Column_List" /> 
+	 from ipk_card where id = #{id}
+</select>
+
+<!-- 卡片信息表 列表总数-->
+<select id="queryByCount" resultType="java.lang.Integer"  parameterType="Object">
+	select count(1) from ipk_card 
+	<include refid="Example_Where_Clause"/>
+</select>
+  	
+<!-- 查询卡片信息表列表 -->
+<select id="queryList" resultMap="BaseResultMap"  parameterType="Object">
+	select 
+	<include refid="Base_Column_List"/>
+	from ipk_card 
+	<include refid="Example_Where_Clause"/>
+	<if test="pager.orderCondition != null and pager.orderCondition != ''" >
+      ${pager.orderCondition}
+    </if>
+    <if test="pager.mysqlQueryCondition != null and pager.mysqlQueryCondition != ''" >
+       ${pager.mysqlQueryCondition}
+    </if>
+</select>
+  	
+</mapper>   

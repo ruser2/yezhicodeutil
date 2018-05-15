@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${bussPackage}.mapper.${entityPackage}.${className}Mapper" > 
+<!-- Result Map-->
+<resultMap id="BaseResultMap" type="${bussPackage}.domain.${entityPackage}.$!{className}" >
+	#foreach($item in $!{columnDatas})
+<!-- $item.columnComment -->	
+	<result column="$!item.jdbcName" property="$item.columnName"/>
+	#end 
+</resultMap>
+       
+<!-- $!{tableName} table all fields -->
+<sql id="Base_Column_List" >
+	 $!{SQL.jdbcFields}
+</sql>
+   
+   
+<!-- 查询条件 -->
+<sql id="Example_Where_Clause">
+where 1=1
+#if($!isPseudoDelete == true)
+	and t1.Data_Status != -1
+#end
+<trim  suffixOverrides="," >
+#foreach($item in $!{columnDatas})
+#set($testStr = "@com.yllt.utils.MapperUtil@instance.isEmpty(" + $!item.columnName + ")")
+<if test="$!testStr" >
+	and t1.$!item.jdbcName =  #{$!item.columnName}
+</if>
+#if($!item.dataType == 'java.lang.String')
+	#set($likeStr = "@com.yllt.utils.MapperUtil@instance.isEmpty(" + $!item.columnName + "Like)")
+	#set($likeName = $!item.columnName + "Like")
+<if test="$!likeStr" >
+	and t1.$!item.jdbcName like concat(concat('%', #{$!likeName}), '%')
+</if>
+#end
+#if($!item.dataType == 'java.util.Date')
+	#set($beginStr = "@com.yllt.utils.MapperUtil@instance.isEmpty(" + $!item.columnName + "Begin)")
+	#set($endStr = "@com.yllt.utils.MapperUtil@instance.isEmpty(" + $!item.columnName + "End)")
+	#set($beginName = $!item.columnName + "Begin")
+	#set($endName = $!item.columnName + "End")
+<if test="$!beginStr" >
+	and t1.$!item.jdbcName &gt;= #{$!beginName}
+</if>
+<if test="$!endStr" >
+	and t1.$!item.jdbcName &lt;= #{$!endName}
+</if>
+#end
+#end
+<if test="@com.yllt.utils.MapperUtil@instance.isEmpty(ids)" >
+	and t1.id in 
+	<foreach collection="ids" item="item" index="index" open="(" separator="," close=")">#{item}</foreach>
+</if>
+
+</trim>
+</sql>
+
+<!-- 删除条件 -->
+<sql id="Delete_Where_Clause">
+where 1=1
+<trim  suffixOverrides="," >
+#foreach($item in $!{columnDatas})
+#set($testStr = "@com.yllt.utils.MapperUtil@instance.isEmpty(" + $!item.columnName + ")")
+<if test="$!testStr" >
+	and $!item.jdbcName =  #{$!item.columnName}
+</if>
+#if($!item.dataType == 'java.lang.String')
+	#set($likeStr = "@com.yllt.utils.MapperUtil@instance.isEmpty(" + $!item.columnName + "Like)")
+	#set($likeName = $!item.columnName + "Like")
+<if test="$!likeStr" >
+	and $!item.jdbcName like concat(concat('%', #{$!likeName}), '%')
+</if>
+#end
+#if($!item.dataType == 'java.util.Date')
+	#set($beginStr = "@com.yllt.utils.MapperUtil@instance.isEmpty(" + $!item.columnName + "Begin)")
+	#set($endStr = "@com.yllt.utils.MapperUtil@instance.isEmpty(" + $!item.columnName + "End)")
+	#set($beginName = $!item.columnName + "Begin")
+	#set($endName = $!item.columnName + "End")
+<if test="$!beginStr" >
+	and $!item.jdbcName &gt;= #{$!beginName}
+</if>
+<if test="$!endStr" >
+	and $!item.jdbcName &lt;= #{$!endName}
+</if>
+#end
+#end
+<if test="@com.yllt.utils.MapperUtil@instance.isEmpty(ids)" >
+	and id in 
+	<foreach collection="ids" item="item" index="index" open="(" separator="," close=")">#{item}</foreach>
+</if>
+</trim>
+</sql>
+
+<sql id="Example_orderBy_Clause">
+<trim suffixOverrides=",">
+	 <if test="@com.yllt.utils.MapperUtil@instance.isEmpty(orderBy)">
+		order by t1.${orderBy}
+	 	<if test="@com.yllt.utils.MapperUtil@instance.isEmpty(sortBy)">
+	 		${sortBy}
+	 	</if>
+	 </if>
+</trim>
+
+</sql>
+   
+
+<!-- 批量插入记录 -->
+<insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true">
+  insert into $!{tableName}
+  (
+  <trim  suffixOverrides="," >
+  #foreach($item in $!{columnDatas})#if($!item.columnName != 'id')$!item.jdbcName,#end#end
+  </trim>
+  )
+  
+  values
+  
+  <foreach collection="list" item="item" index="index" separator="," >  
+  (
+  	  <trim  suffixOverrides="," >
+	  #foreach($item in $!{columnDatas})#if($!item.columnName != 'id')#{item.$!item.columnName},#end#end
+	  </trim>
+  )  
+  </foreach>  
+</insert>
+
+<!-- 删除记录 -->
+#if($!isPseudoDelete == true)
+<update id="deleteBatch" parameterType="Object">
+	update $!{tableName} set Data_Status = -1  <include refid="Delete_Where_Clause"/>  
+</update>
+#else
+<delete id="deleteBatch" parameterType="Object">
+	delete from $!{tableName} <include refid="Delete_Where_Clause"/>  
+</delete>
+#end
+
+<!-- 插入记录 -->
+<insert id="insert" parameterType="Object" keyProperty="id" useGeneratedKeys="true">
+  $!{SQL.insert}
+</insert>
+
+<!-- 根据id，修改记录-->  
+<update id="updateByPrimaryKey" parameterType="Object" >
+  $!{SQL.update}
+</update>
+ 
+<!-- 修改记录，只修改只不为空的字段 -->
+<update id="updateByPrimaryKeySelective" parameterType="Object" >
+	$!{SQL.updateSelective}
+</update>
+
+<!-- 删除记录 -->
+#if($!isPseudoDelete == true)
+<update id="deleteByPrimaryKey" parameterType="Object">
+	update $!{tableName} set Data_Status = -1  where id = #{id}
+</update>
+#else
+<delete id="deleteByPrimaryKey" parameterType="Object">
+	$!{SQL.delete}
+</delete>
+#end
+ 
+<!-- 根据id查询 ${codeName} -->
+<select id="selectByPrimaryKey"  resultMap="BaseResultMap" parameterType="Object">
+	$!{SQL.selectById}
+</select>
+
+<!-- ${codeName} 列表总数-->
+<select id="queryByCount" resultType="java.lang.Integer"  parameterType="Object">
+	select count(1) from ${tableName} t1
+	<include refid="Example_Where_Clause"/>
+</select>
+  	
+<!-- 查询${codeName}列表 -->
+<select id="query" resultMap="BaseResultMap"  parameterType="Object">
+	select 
+	<include refid="Base_Column_List"/>
+	from ${tableName} t1
+	<include refid="Example_Where_Clause"/>
+	<include refid="Example_orderBy_Clause"/>
+</select>
+
+<!-- 查询${codeName}符合条件的id -->
+<select id="queryIds" parameterType="Object" resultType="int">
+	select id
+	from ${tableName} t1
+	<include refid="Example_Where_Clause"/>
+</select>
+  	
+</mapper>   
